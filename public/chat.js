@@ -75,18 +75,48 @@ const modelCatalog = [
 	["Other", "@cf/ai4bharat/indictrans2-en-indic-1B", "31,050 input / 31,050 output neurons per M tokens"],
 ];
 
-for (const [category, id, pricing] of modelCatalog) {
+let currentCategory = "";
+for (const [category, id] of modelCatalog) {
+	if (category !== currentCategory) {
+		const group = document.createElement("optgroup");
+		group.label = category;
+		modelInput.appendChild(group);
+		currentCategory = category;
+	}
 	const option = document.createElement("option");
 	option.value = id;
-	option.textContent = `${category}: ${id}`;
-	modelInput.appendChild(option);
+	option.textContent = id;
+	modelInput.lastElementChild.appendChild(option);
 }
 
 function updateModelPricing() {
 	const model = modelCatalog.find((entry) => entry[1] === modelInput.value);
-	modelPricing.textContent = model
-		? `${model[0]} · ${model[2]} · $0.011 per 1,000 neurons`
-		: "";
+	modelPricing.replaceChildren();
+	if (!model) return;
+
+	const title = document.createElement("div");
+	title.className = "pricing-title";
+	title.textContent = `${model[0]} pricing · $0.011 per 1,000 neurons`;
+	modelPricing.appendChild(title);
+
+	for (const price of model[2].split(" / ")) {
+		const row = document.createElement("div");
+		row.className = "pricing-row";
+		const label = document.createElement("span");
+		label.className = "pricing-label";
+		const value = document.createElement("span");
+		const lowerPrice = price.toLowerCase();
+		label.textContent = lowerPrice.includes("cached")
+			? "Cached input"
+			: lowerPrice.includes("output")
+				? "Output"
+				: lowerPrice.includes("input")
+					? "Input"
+					: "Rate";
+		value.textContent = price;
+		row.append(label, value);
+		modelPricing.appendChild(row);
+	}
 }
 
 modelInput.addEventListener("change", updateModelPricing);
