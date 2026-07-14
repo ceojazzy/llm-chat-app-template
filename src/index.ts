@@ -119,7 +119,7 @@ async function handleChatRequest(
 				punctuate: body.punctuate,
 				smart_format: body.smart_format,
 			}, { returnRawResponse: true });
-			return result;
+			return result as Response;
 		}
 
 		if (requestedModel === "@cf/qwen/qwen3-embedding-0.6b") {
@@ -184,7 +184,7 @@ async function handleChatRequest(
       // },
     });
 
-    return new Response(stream, {
+    return new Response(stream as unknown as BodyInit, {
       headers: {
         "content-type": "text/event-stream; charset=utf-8",
         "cache-control": "no-cache",
