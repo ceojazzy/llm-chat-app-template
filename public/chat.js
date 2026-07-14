@@ -77,6 +77,32 @@ const modelCatalog = [
 	["Other", "@cf/ai4bharat/indictrans2-en-indic-1B", "31,050 input / 31,050 output neurons per M tokens"],
 ];
 
+const releasedOnOrAfterOctober2025 = new Set([
+	"@cf/deepgram/nova-3",
+	"@cf/meta/llama-4-scout-17b-16e-instruct",
+	"@cf/qwen/qwen3-30b-a3b-fp8",
+	"@cf/openai/gpt-oss-120b",
+	"@cf/openai/gpt-oss-20b",
+	"@cf/ibm-granite/granite-4.0-h-micro",
+	"@cf/zai-org/glm-5.2",
+	"@cf/moonshotai/kimi-k2.5",
+	"@cf/moonshotai/kimi-k2.6",
+	"@cf/moonshotai/kimi-k2.7-code",
+	"@cf/google/gemma-4-26b-a4b-it",
+	"@cf/qwen/qwen3-embedding-0.6b",
+	"@cf/black-forest-labs/flux-2-dev",
+	"@cf/black-forest-labs/flux-2-klein-4b",
+	"@cf/black-forest-labs/flux-2-klein-9b",
+	"@cf/deepgram/flux (WebSocket)",
+	"@cf/moondream/moondream3.1-9B-A2B",
+]);
+
+modelCatalog.splice(
+	0,
+	modelCatalog.length,
+	...modelCatalog.filter(([, id]) => releasedOnOrAfterOctober2025.has(id)),
+);
+
 let currentCategory = "";
 for (const [category, id] of modelCatalog) {
 	if (category !== currentCategory) {
