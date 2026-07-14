@@ -97,6 +97,12 @@
 				min-height: 44px;
 			}
 
+			.model-pricing {
+				margin-top: 0.4rem;
+				font-size: 0.78rem;
+				color: var(--text-light);
+			}
+
 			#system-prompt {
 				min-height: 220px;
 				resize: vertical;
@@ -210,18 +216,8 @@
 				<div class="settings-group">
 					<label class="settings-label" for="model-select">Model</label>
 					<select id="model-select">
-						<option value="openai/gpt-5-chat">OpenAI GPT-5 Chat</option>
-						<option value="openai/gpt-5">OpenAI GPT-5</option>
-						<option value="openai/gpt-5.1-chat">OpenAI GPT-5.1 Chat</option>
-						<option value="openai/gpt-5.1">OpenAI GPT-5.1</option>
-						<option value="openai/gpt-5.4-nano">OpenAI GPT-5.4 Nano</option>
-						<option value="openai/gpt-5.4">OpenAI GPT-5.4</option>
-						<option value="google/gemini-3.1-pro">Google Gemini 3.1 Pro</option>
-						<option value="google/gemini-3-flash">Google Gemini 3 Flash</option>
-						<option value="google/gemini-3.1-flash-lite">Google Gemini 3.1 Flash Lite</option>
-						<option value="google/gemini-3.5-flash">Google Gemini 3.5 Flash</option>
-						<option value="@cf/google/gemma-4-26b-a4b-it">Google Gemma 4 26B A4B IT</option>
 					</select>
+					<p id="model-pricing" class="model-pricing"></p>
 				</div>
 
 				<div class="settings-group">
