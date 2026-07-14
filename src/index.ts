@@ -11,7 +11,7 @@ import { Env, ChatMessage } from "./types";
 
 // Model ID for Workers AI model
 // https://developers.cloudflare.com/workers-ai/models/
-const MODEL_ID = "@cf/google/gemma-4-26b-a4b-it";
+const MODEL_ID = "alibaba/qwen3-max";
 
 // Default system prompt
 const SYSTEM_PROMPT =
