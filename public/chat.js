@@ -10,6 +10,7 @@ const sendButton = document.getElementById("send-button");
 const typingIndicator = document.getElementById("typing-indicator");
 const modelInput = document.getElementById("model-select");
 const copyModelButton = document.getElementById("copy-model-button");
+const audioInput = document.getElementById("audio-input");
 const systemPromptInput = document.getElementById("system-prompt");
 const modelPricing = document.getElementById("model-pricing");
 const headerPricing = document.getElementById("header-pricing");
@@ -152,6 +153,24 @@ function updateModelPricing() {
 modelInput.addEventListener("change", updateModelPricing);
 updateModelPricing();
 
+function isAudioModel() {
+	return modelInput.value.startsWith("@cf/deepgram/") &&
+		modelInput.value.includes("nova-3");
+}
+
+function isEmbeddingModel() {
+	return modelInput.value.includes("embedding") || modelInput.value.includes("bge-");
+}
+
+modelInput.addEventListener("change", () => {
+	userInput.placeholder = isAudioModel()
+		? "Choose an audio file, then click Send"
+		: isEmbeddingModel()
+			? "Enter text to generate embeddings"
+			: "Type your message here...";
+	if (isAudioModel()) audioInput.click();
+});
+
 copyModelButton.addEventListener("click", async () => {
 	try {
 		await navigator.clipboard.writeText(modelInput.value);
@@ -219,16 +238,31 @@ async function sendMessage() {
 	chatMessages.scrollTop = chatMessages.scrollHeight;
 
 	try {
+		let requestBody = {
+			messages: chatHistory,
+			model: modelInput.value,
+			systemPrompt: systemPromptInput.value,
+		};
+
+		if (isAudioModel()) {
+			if (!audioInput.files?.[0]) throw new Error("Choose an audio file first");
+			const buffer = await audioInput.files[0].arrayBuffer();
+			const bytes = new Uint8Array(buffer);
+			let binary = "";
+			for (let index = 0; index < bytes.length; index += 0x8000) {
+				binary += String.fromCharCode(...bytes.subarray(index, index + 0x8000));
+			}
+			requestBody = { model: modelInput.value, audio: btoa(binary), language: "en" };
+		} else if (isEmbeddingModel()) {
+			requestBody = { model: modelInput.value, text: [message] };
+		}
+
 		const response = await fetch("/api/chat", {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
 			},
-			body: JSON.stringify({
-				messages: chatHistory,
-				model: modelInput.value,
-				systemPrompt: systemPromptInput.value,
-			}),
+			body: JSON.stringify(requestBody),
 		});
 
 		if (!response.ok) {
@@ -247,8 +281,7 @@ async function sendMessage() {
 		const contentType = response.headers.get("content-type") || "";
 		if (!contentType.includes("text/event-stream")) {
 			const data = await response.json();
-			const content = extractResponseText(data);
-			if (!content) throw new Error("The model returned an empty response");
+			const content = extractResponseText(data) || JSON.stringify(data, null, 2);
 			assistantTextEl.textContent = content;
 			chatHistory.push({ role: "assistant", content });
 			return;

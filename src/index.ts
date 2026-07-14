@@ -23,6 +23,8 @@ const ALLOWED_MODEL_IDS = new Set([
   "@cf/moonshotai/kimi-k2.6",
   "@cf/moonshotai/kimi-k2.7-code",
   "@cf/google/gemma-4-26b-a4b-it",
+  "@cf/deepgram/nova-3",
+  "@cf/qwen/qwen3-embedding-0.6b",
 ]);
 
 // Default system prompt
@@ -70,17 +72,17 @@ async function handleChatRequest(
 ): Promise<Response> {
   try {
     // Parse JSON request body
-    const {
-      messages = [],
-      systemPrompt,
-      model,
-    } = (await request.json()) as {
-      messages: ChatMessage[];
-      systemPrompt?: string;
-      model?: string;
-    };
+		const body = (await request.json()) as {
+			audio?: string;
+			language?: string;
+			text?: string[];
+			messages?: ChatMessage[];
+			systemPrompt?: string;
+			model?: string;
+		};
+		const { messages = [], systemPrompt, model } = body;
 
-    const resolvedSystemPrompt = systemPrompt?.trim() || SYSTEM_PROMPT;
+		const resolvedSystemPrompt = systemPrompt?.trim() || SYSTEM_PROMPT;
     const requestedModel = model?.trim() || DEFAULT_MODEL_ID;
     if (!ALLOWED_MODEL_IDS.has(requestedModel)) {
       return new Response(
@@ -90,7 +92,23 @@ async function handleChatRequest(
     }
     const resolvedModel = requestedModel;
 
-    const contents = messages
+		if (requestedModel === "@cf/deepgram/nova-3") {
+			if (typeof body.audio !== "string") {
+				return new Response(JSON.stringify({ error: "Audio data is required" }), { status: 400, headers: { "content-type": "application/json" } });
+			}
+			const result = await env.AI.run(requestedModel, { audio: body.audio, language: body.language || "en" });
+			return Response.json(result);
+		}
+
+		if (requestedModel === "@cf/qwen/qwen3-embedding-0.6b") {
+			if (!Array.isArray(body.text)) {
+				return new Response(JSON.stringify({ error: "Text input is required" }), { status: 400, headers: { "content-type": "application/json" } });
+			}
+			const result = await env.AI.run(requestedModel, { text: body.text });
+			return Response.json(result);
+		}
+
+		const contents = messages
       .filter((msg) => msg.role !== "system")
       .map((msg) => ({
         role: msg.role === "assistant" ? "model" : "user",
