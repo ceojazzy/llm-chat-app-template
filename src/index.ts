@@ -11,7 +11,7 @@ import { Env, ChatMessage } from "./types";
 
 // Model ID for Workers AI model
 // https://developers.cloudflare.com/workers-ai/models/
-const MODEL_ID = "alibaba/qwen3-max";
+const DEFAULT_MODEL_ID = "google/gemini-3.5-flash";
 
 // Default system prompt
 const SYSTEM_PROMPT =
@@ -58,22 +58,34 @@ async function handleChatRequest(
 ): Promise<Response> {
 	try {
 		// Parse JSON request body
-		const { messages = [] } = (await request.json()) as {
+		const { messages = [], systemPrompt, model } = (await request.json()) as {
 			messages: ChatMessage[];
+			systemPrompt?: string;
+			model?: string;
 		};
 
-		// Add system prompt if not present
-		if (!messages.some((msg) => msg.role === "system")) {
-			messages.unshift({ role: "system", content: SYSTEM_PROMPT });
-		}
+		const resolvedSystemPrompt = systemPrompt?.trim() || SYSTEM_PROMPT;
+		const resolvedModel = model?.trim() || DEFAULT_MODEL_ID;
+
+		const contents = messages
+			.filter((msg) => msg.role !== "system")
+			.map((msg) => ({
+				role: msg.role === "assistant" ? "model" : "user",
+				parts: [{ text: msg.content }],
+			}));
 
 		const inputs = {
-			messages,
-			max_tokens: 1024,
+			contents,
+			generationConfig: {
+				temperature: 0.3,
+			},
+			systemInstruction: {
+				parts: [{ text: resolvedSystemPrompt }],
+			},
 			stream: true,
-		} satisfies AiTextGenerationInput & { stream: true };
+		};
 
-		const stream = await env.AI.run<typeof MODEL_ID>(MODEL_ID, inputs, {
+		const stream = await env.AI.run(resolvedModel, inputs, {
 			// Uncomment to use AI Gateway
 			// gateway: {
 			//   id: "YOUR_GATEWAY_ID", // Replace with your AI Gateway ID

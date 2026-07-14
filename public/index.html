@@ -28,7 +28,7 @@
 					Cantarell, sans-serif;
 				line-height: 1.6;
 				color: var(--text-color);
-				max-width: 800px;
+				max-width: 1200px;
 				margin: 0 auto;
 				padding: 1rem;
 			}
@@ -47,12 +47,66 @@
 
 			.chat-container {
 				display: flex;
-				flex-direction: column;
 				height: calc(100vh - 200px);
 				min-height: 400px;
 				border: 1px solid var(--border-color);
 				border-radius: 8px;
 				overflow: hidden;
+			}
+
+			.sidebar {
+				width: 320px;
+				padding: 1rem;
+				border-right: 1px solid var(--border-color);
+				background-color: white;
+			}
+
+			.sidebar h2 {
+				font-size: 1rem;
+				margin-bottom: 0.5rem;
+			}
+
+			.sidebar p {
+				font-size: 0.9rem;
+				color: var(--text-light);
+				margin-bottom: 0.75rem;
+			}
+
+			.settings-group {
+				margin-bottom: 1rem;
+			}
+
+			.settings-label {
+				display: block;
+				font-size: 0.9rem;
+				font-weight: 600;
+				margin-bottom: 0.4rem;
+			}
+
+			#model-select,
+			#system-prompt {
+				width: 100%;
+				padding: 0.75rem;
+				border: 1px solid var(--border-color);
+				border-radius: 4px;
+				font-family: inherit;
+				background-color: white;
+			}
+
+			#model-select {
+				min-height: 44px;
+			}
+
+			#system-prompt {
+				min-height: 220px;
+				resize: vertical;
+			}
+
+			.chat-panel {
+				flex: 1;
+				display: flex;
+				flex-direction: column;
+				min-width: 0;
 			}
 
 			.chat-messages {
@@ -149,27 +203,51 @@
 		</header>
 
 		<div class="chat-container">
-			<div id="chat-messages" class="chat-messages">
-				<div class="message assistant-message">
-					<p>
-						Hello! I'm an LLM chat app powered by Cloudflare Workers AI. How can
-						I help you today?
-					</p>
+			<aside class="sidebar">
+				<h2>Settings</h2>
+				<p>These values are sent with every request. You can change them here.</p>
+
+				<div class="settings-group">
+					<label class="settings-label" for="model-select">Model</label>
+					<input
+						id="model-select"
+						type="text"
+						value="google/gemini-3.5-flash"
+						placeholder="google/gemini-3.5-flash"
+					/>
 				</div>
-			</div>
 
-			<div class="typing-indicator" id="typing-indicator">
-				AI is thinking...
-			</div>
+				<div class="settings-group">
+					<label class="settings-label" for="system-prompt">System prompt</label>
+					<textarea id="system-prompt">
+You are a helpful, friendly assistant. Provide concise and accurate responses.</textarea
+					>
+				</div>
+			</aside>
 
-			<div class="message-input">
-				<textarea
-					id="user-input"
-					placeholder="Type your message here..."
-					rows="1"
-					autofocus
-				></textarea>
-				<button id="send-button">Send</button>
+			<div class="chat-panel">
+				<div id="chat-messages" class="chat-messages">
+					<div class="message assistant-message">
+						<p>
+							Hello! I'm an LLM chat app powered by Cloudflare Workers AI. How can
+							I help you today?
+						</p>
+					</div>
+				</div>
+
+				<div class="typing-indicator" id="typing-indicator">
+					AI is thinking...
+				</div>
+
+				<div class="message-input">
+					<textarea
+						id="user-input"
+						placeholder="Type your message here..."
+						rows="1"
+						autofocus
+					></textarea>
+					<button id="send-button">Send</button>
+				</div>
 			</div>
 		</div>
 
