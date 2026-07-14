@@ -162,6 +162,10 @@ function isEmbeddingModel() {
 	return modelInput.value.includes("embedding") || modelInput.value.includes("bge-");
 }
 
+function isImageModel() {
+	return modelInput.value.startsWith("@cf/black-forest-labs/flux-");
+}
+
 modelInput.addEventListener("change", () => {
 	userInput.placeholder = isAudioModel()
 		? "Choose an audio file, then click Send"
@@ -252,9 +256,16 @@ async function sendMessage() {
 			for (let index = 0; index < bytes.length; index += 0x8000) {
 				binary += String.fromCharCode(...bytes.subarray(index, index + 0x8000));
 			}
-			requestBody = { model: modelInput.value, audio: btoa(binary), language: "en" };
+			requestBody = {
+				model: modelInput.value,
+				audio: btoa(binary),
+				audioContentType: audioInput.files[0].type || "audio/mpeg",
+				language: "en",
+			};
 		} else if (isEmbeddingModel()) {
 			requestBody = { model: modelInput.value, text: [message] };
+		} else if (isImageModel()) {
+			requestBody = { model: modelInput.value, prompt: message, width: 1024, height: 1024 };
 		}
 
 		const response = await fetch("/api/chat", {
@@ -280,6 +291,14 @@ async function sendMessage() {
 
 		const contentType = response.headers.get("content-type") || "";
 		if (!contentType.includes("text/event-stream")) {
+			if (contentType.startsWith("image/")) {
+				const image = document.createElement("img");
+				image.src = URL.createObjectURL(await response.blob());
+				image.alt = message;
+				image.style.maxWidth = "100%";
+				assistantTextEl.replaceWith(image);
+				return;
+			}
 			const data = await response.json();
 			const content = extractResponseText(data) || JSON.stringify(data, null, 2);
 			assistantTextEl.textContent = content;
