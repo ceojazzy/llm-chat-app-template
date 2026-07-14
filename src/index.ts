@@ -16,6 +16,7 @@ const ALLOWED_MODEL_IDS = new Set([
   "openai/gpt-5-chat",
   "openai/gpt-5",
   "google/gemini-3.1-pro",
+  "google/gemini-3-flash",
   "google/gemini-3.1-flash-lite",
 ]);
 
