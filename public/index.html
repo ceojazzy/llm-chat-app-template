@@ -157,6 +157,27 @@
 				color: var(--text-color);
 			}
 
+			.model-controls {
+				display: grid;
+				gap: 0.65rem;
+				margin-top: 0.8rem;
+			}
+
+			.model-controls-row {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 0.5rem;
+			}
+
+			.model-controls input,
+			.model-controls select {
+				width: 100%;
+				padding: 0.65rem;
+				border: 1px solid var(--border-color);
+				border-radius: 9px;
+				font: inherit;
+			}
+
 			#system-prompt {
 				min-height: 220px;
 				resize: vertical;
@@ -343,6 +364,31 @@
 					<textarea id="system-prompt">
 You are a helpful, friendly assistant. Provide concise and accurate responses.</textarea
 					>
+				</div>
+
+				<div id="image-controls" class="model-controls" hidden>
+					<label class="settings-label" for="image-width">Image size</label>
+					<div class="model-controls-row">
+						<input id="image-width" type="number" min="256" max="1536" step="64" value="720" aria-label="Image width" />
+						<input id="image-height" type="number" min="256" max="1536" step="64" value="1280" aria-label="Image height" />
+					</div>
+				</div>
+
+				<div id="audio-controls" class="model-controls" hidden>
+					<label class="settings-label" for="audio-language">Nova 3 options</label>
+					<select id="audio-language">
+						<option value="en-US">English (US)</option>
+						<option value="multi">Automatic multilingual</option>
+						<option value="es">Spanish</option>
+						<option value="fr">French</option>
+						<option value="de">German</option>
+						<option value="hi">Hindi</option>
+						<option value="ja">Japanese</option>
+					</select>
+					<label><input id="audio-detect-language" type="checkbox" checked /> Detect language</label>
+					<label><input id="audio-diarize" type="checkbox" /> Identify speakers</label>
+					<label><input id="audio-punctuate" type="checkbox" checked /> Punctuation</label>
+					<label><input id="audio-smart-format" type="checkbox" checked /> Smart formatting</label>
 				</div>
 			</aside>
 

@@ -79,6 +79,10 @@ async function handleChatRequest(
 			audio?: string;
 			audioContentType?: string;
 			language?: string;
+			detect_language?: boolean;
+			diarize?: boolean;
+			punctuate?: boolean;
+			smart_format?: boolean;
 			text?: string[];
 			prompt?: string;
 			width?: number;
@@ -110,7 +114,10 @@ async function handleChatRequest(
 					body: new Response(bytes).body!,
 					contentType: body.audioContentType || "audio/mpeg",
 				},
-				detect_language: true,
+				detect_language: body.detect_language ?? true,
+				diarize: body.diarize,
+				punctuate: body.punctuate,
+				smart_format: body.smart_format,
 			}, { returnRawResponse: true });
 			return result;
 		}

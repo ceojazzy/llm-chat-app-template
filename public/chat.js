@@ -15,6 +15,15 @@ const systemPromptInput = document.getElementById("system-prompt");
 const systemPromptGroup = document.getElementById("system-prompt-group");
 const modelPricing = document.getElementById("model-pricing");
 const headerPricing = document.getElementById("header-pricing");
+const imageControls = document.getElementById("image-controls");
+const audioControls = document.getElementById("audio-controls");
+const imageWidth = document.getElementById("image-width");
+const imageHeight = document.getElementById("image-height");
+const audioLanguage = document.getElementById("audio-language");
+const audioDetectLanguage = document.getElementById("audio-detect-language");
+const audioDiarize = document.getElementById("audio-diarize");
+const audioPunctuate = document.getElementById("audio-punctuate");
+const audioSmartFormat = document.getElementById("audio-smart-format");
 
 const modelCatalog = [
 	["LLM", "@cf/meta/llama-3.2-1b-instruct", "2,457 input / 18,252 output neurons per M tokens"],
@@ -169,6 +178,8 @@ function isImageModel() {
 
 function updateSystemPromptVisibility() {
 	systemPromptGroup.hidden = isAudioModel() || isImageModel() || isEmbeddingModel();
+	imageControls.hidden = !isImageModel();
+	audioControls.hidden = !isAudioModel();
 }
 
 modelInput.addEventListener("change", () => {
@@ -268,12 +279,21 @@ async function sendMessage() {
 				model: modelInput.value,
 				audio: btoa(binary),
 				audioContentType: audioInput.files[0].type || "audio/mpeg",
-				language: "en",
+				language: audioLanguage.value,
+				detect_language: audioDetectLanguage.checked,
+				diarize: audioDiarize.checked,
+				punctuate: audioPunctuate.checked,
+				smart_format: audioSmartFormat.checked,
 			};
 		} else if (isEmbeddingModel()) {
 			requestBody = { model: modelInput.value, text: [message] };
 		} else if (isImageModel()) {
-			requestBody = { model: modelInput.value, prompt: message, width: 1024, height: 1024 };
+			requestBody = {
+				model: modelInput.value,
+				prompt: message,
+				width: Number(imageWidth.value) || 720,
+				height: Number(imageHeight.value) || 1280,
+			};
 		}
 
 		const response = await fetch("/api/chat", {
