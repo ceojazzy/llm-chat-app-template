@@ -97,6 +97,34 @@
 				min-height: 44px;
 			}
 
+			.model-selector-row {
+				display: flex;
+				gap: 0.45rem;
+				align-items: stretch;
+			}
+
+			.model-selector-row #model-select {
+				flex: 1;
+				min-width: 0;
+			}
+
+			#copy-model-button {
+				border: 1px solid var(--border-color);
+				border-radius: 8px;
+				background: var(--light-bg);
+				color: var(--text-color);
+				padding: 0 0.75rem;
+				font: inherit;
+				font-size: 0.82rem;
+				cursor: pointer;
+				transition: 0.2s ease;
+			}
+
+			#copy-model-button:hover {
+				border-color: var(--primary-color);
+				color: var(--primary-color);
+			}
+
 			#model-select optgroup {
 				text-align: center;
 				font-weight: 700;
@@ -239,8 +267,10 @@
 
 				<div class="settings-group">
 					<label class="settings-label" for="model-select">Model</label>
-					<select id="model-select">
-					</select>
+					<div class="model-selector-row">
+						<select id="model-select"></select>
+						<button id="copy-model-button" type="button" title="Copy model ID">Copy</button>
+					</div>
 					<p id="model-pricing" class="model-pricing"></p>
 				</div>
 

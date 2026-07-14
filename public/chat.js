@@ -9,6 +9,7 @@ const userInput = document.getElementById("user-input");
 const sendButton = document.getElementById("send-button");
 const typingIndicator = document.getElementById("typing-indicator");
 const modelInput = document.getElementById("model-select");
+const copyModelButton = document.getElementById("copy-model-button");
 const systemPromptInput = document.getElementById("system-prompt");
 const modelPricing = document.getElementById("model-pricing");
 const headerPricing = document.getElementById("header-pricing");
@@ -122,6 +123,22 @@ function updateModelPricing() {
 
 modelInput.addEventListener("change", updateModelPricing);
 updateModelPricing();
+
+copyModelButton.addEventListener("click", async () => {
+	try {
+		await navigator.clipboard.writeText(modelInput.value);
+		copyModelButton.textContent = "Copied";
+		setTimeout(() => {
+			copyModelButton.textContent = "Copy";
+		}, 1200);
+	} catch (error) {
+		console.error("Could not copy model ID:", error);
+		copyModelButton.textContent = "Copy failed";
+		setTimeout(() => {
+			copyModelButton.textContent = "Copy";
+		}, 1200);
+	}
+});
 
 let chatHistory = [
 	{
