@@ -11,7 +11,13 @@ import { Env, ChatMessage } from "./types";
 
 // Model ID for Workers AI model
 // https://developers.cloudflare.com/workers-ai/models/
-const DEFAULT_MODEL_ID = "google/gemini-3.5-flash";
+const DEFAULT_MODEL_ID = "openai/gpt-5-chat";
+const ALLOWED_MODEL_IDS = new Set([
+	"openai/gpt-5-chat",
+	"google/gemini-3.1-pro",
+	"google/gemini-3.1-flash-lite",
+	"openai/gpt-5",
+]);
 
 // Default system prompt
 const SYSTEM_PROMPT =
@@ -65,7 +71,10 @@ async function handleChatRequest(
 		};
 
 		const resolvedSystemPrompt = systemPrompt?.trim() || SYSTEM_PROMPT;
-		const resolvedModel = model?.trim() || DEFAULT_MODEL_ID;
+		const requestedModel = model?.trim() || DEFAULT_MODEL_ID;
+		const resolvedModel = ALLOWED_MODEL_IDS.has(requestedModel)
+			? requestedModel
+			: DEFAULT_MODEL_ID;
 
 		const contents = messages
 			.filter((msg) => msg.role !== "system")
@@ -73,6 +82,13 @@ async function handleChatRequest(
 				role: msg.role === "assistant" ? "model" : "user",
 				parts: [{ text: msg.content }],
 			}));
+
+		if (contents.length === 0) {
+			return new Response(JSON.stringify({ error: "At least one user message is required" }), {
+				status: 400,
+				headers: { "content-type": "application/json" },
+			});
+		}
 
 		const inputs = {
 			contents,
@@ -103,8 +119,9 @@ async function handleChatRequest(
 		});
 	} catch (error) {
 		console.error("Error processing chat request:", error);
+		const message = error instanceof Error ? error.message : String(error);
 		return new Response(
-			JSON.stringify({ error: "Failed to process request" }),
+			JSON.stringify({ error: message || "Failed to process request" }),
 			{
 				status: 500,
 				headers: { "content-type": "application/json" },

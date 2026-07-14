@@ -75,11 +75,26 @@ async function sendMessage() {
 		});
 
 		if (!response.ok) {
-			throw new Error("Failed to get response");
+			let errorMessage = "Failed to get response";
+			try {
+				const errorData = await response.json();
+				errorMessage = errorData.error || errorMessage;
+			} catch {}
+			throw new Error(errorMessage);
 		}
 
 		if (!response.body) {
 			throw new Error("Response body is null");
+		}
+
+		const contentType = response.headers.get("content-type") || "";
+		if (!contentType.includes("text/event-stream")) {
+			const data = await response.json();
+			const content = extractResponseText(data);
+			if (!content) throw new Error("The model returned an empty response");
+			assistantTextEl.textContent = content;
+			chatHistory.push({ role: "assistant", content });
+			return;
 		}
 
 		const reader = response.body.getReader();
@@ -131,7 +146,7 @@ async function sendMessage() {
 	} catch (error) {
 		console.error("Error:", error);
 		assistantTextEl.textContent =
-			"Sorry, there was an error processing your request.";
+			`Sorry, there was an error processing your request. ${error.message || ""}`;
 	} finally {
 		typingIndicator.classList.remove("visible");
 		isProcessing = false;
