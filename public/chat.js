@@ -299,15 +299,16 @@ async function sendMessage() {
 
 		const contentType = response.headers.get("content-type") || "";
 		if (!contentType.includes("text/event-stream")) {
-			if (contentType.startsWith("image/")) {
+			const data = await response.json();
+			const imageBase64 = data?.image;
+			if (typeof imageBase64 === "string") {
 				const image = document.createElement("img");
-				image.src = URL.createObjectURL(await response.blob());
+				image.src = `data:image/png;base64,${imageBase64}`;
 				image.alt = message;
 				image.style.maxWidth = "100%";
 				assistantTextEl.replaceWith(image);
 				return;
 			}
-			const data = await response.json();
 			const content = extractResponseText(data) || JSON.stringify(data, null, 2);
 			assistantTextEl.textContent = content;
 			chatHistory.push({ role: "assistant", content });

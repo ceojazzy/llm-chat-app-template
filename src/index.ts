@@ -135,7 +135,7 @@ async function handleChatRequest(
 					contentType: formResponse.headers.get("content-type")!,
 				},
 			});
-			return new Response(result, { headers: { "content-type": "image/png" } });
+			return Response.json(result);
 		}
 
 		const contents = messages
