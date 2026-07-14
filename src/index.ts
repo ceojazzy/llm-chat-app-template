@@ -13,11 +13,14 @@ import { Env, ChatMessage } from "./types";
 // https://developers.cloudflare.com/workers-ai/models/
 const DEFAULT_MODEL_ID = "openai/gpt-5-chat";
 const ALLOWED_MODEL_IDS = new Set([
-  "openai/gpt-5-chat",
   "openai/gpt-5",
+  "openai/gpt-5-chat",
+  "openai/gpt-5.1",
+  "openai/gpt-5.1-chat",
   "google/gemini-3.1-pro",
   "google/gemini-3-flash",
   "google/gemini-3.1-flash-lite",
+  "google/gemini-3.5-flash",
 ]);
 
 // Default system prompt
@@ -98,16 +101,28 @@ async function handleChatRequest(
       );
     }
 
-    const inputs = {
-      contents,
-      generationConfig: {
-        temperature: 0.3,
-      },
-      systemInstruction: {
-        parts: [{ text: resolvedSystemPrompt }],
-      },
-      stream: true,
-    };
+    const isOpenAIModel = resolvedModel.startsWith("openai/");
+    const inputs = isOpenAIModel
+      ? {
+          messages: [
+            { content: resolvedSystemPrompt, role: "system" },
+            ...messages
+              .filter((msg) => msg.role !== "system")
+              .map((msg) => ({
+                content: msg.content,
+                role: msg.role,
+              })),
+          ],
+          stream: true,
+        }
+      : {
+          contents,
+          generationConfig: { temperature: 0.3 },
+          systemInstruction: {
+            parts: [{ text: resolvedSystemPrompt }],
+          },
+          stream: true,
+        };
 
     const stream = await env.AI.run(resolvedModel, inputs, {
       // Uncomment to use AI Gateway
