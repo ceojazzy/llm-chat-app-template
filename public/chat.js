@@ -177,9 +177,12 @@ function isImageModel() {
 }
 
 function updateSystemPromptVisibility() {
-	systemPromptGroup.hidden = isAudioModel() || isImageModel() || isEmbeddingModel();
-	imageControls.hidden = !isImageModel();
-	audioControls.hidden = !isAudioModel();
+	const imageSelected = isImageModel();
+	const audioSelected = isAudioModel();
+	const embeddingSelected = isEmbeddingModel();
+	systemPromptGroup.toggleAttribute("hidden", audioSelected || imageSelected || embeddingSelected);
+	imageControls.toggleAttribute("hidden", !imageSelected);
+	audioControls.toggleAttribute("hidden", !audioSelected);
 }
 
 modelInput.addEventListener("change", () => {
