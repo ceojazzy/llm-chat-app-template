@@ -11,6 +11,7 @@ const typingIndicator = document.getElementById("typing-indicator");
 const modelInput = document.getElementById("model-select");
 const systemPromptInput = document.getElementById("system-prompt");
 const modelPricing = document.getElementById("model-pricing");
+const headerPricing = document.getElementById("header-pricing");
 
 const modelCatalog = [
 	["LLM", "@cf/meta/llama-3.2-1b-instruct", "2,457 input / 18,252 output neurons per M tokens"],
@@ -92,12 +93,12 @@ for (const [category, id] of modelCatalog) {
 function updateModelPricing() {
 	const model = modelCatalog.find((entry) => entry[1] === modelInput.value);
 	modelPricing.replaceChildren();
-	if (!model) return;
+	if (!model) {
+		headerPricing.textContent = "Powered by Cloudflare Workers AI";
+		return;
+	}
 
-	const title = document.createElement("div");
-	title.className = "pricing-title";
-	title.textContent = `${model[0]} pricing · $0.011 per 1,000 neurons`;
-	modelPricing.appendChild(title);
+	headerPricing.textContent = `${model[0]} pricing · $0.011 per 1,000 neurons`;
 
 	for (const price of model[2].split(" / ")) {
 		const row = document.createElement("div");
