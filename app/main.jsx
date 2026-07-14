@@ -47,6 +47,7 @@ function App() {
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "dark");
   const [modelOpen, setModelOpen] = useState(false);
   const [modelSearch, setModelSearch] = useState("");
+  const [copied, setCopied] = useState(false);
   const [imageSize, setImageSize] = useState({ width: 720, height: 1280 });
   const [audioFile, setAudioFile] = useState(null);
   const [audioOptions, setAudioOptions] = useState({ language: "en-US", detect_language: true, diarize: false, punctuate: true, smart_format: true });
@@ -117,6 +118,12 @@ function App() {
     } finally { setBusy(false); }
   }
 
+  async function copyModelId() {
+    await navigator.clipboard.writeText(model);
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 5000);
+  }
+
   return <main className={`${theme === "light" ? "light" : ""} min-h-screen px-4 py-6 text-slate-100 sm:px-8`}>
     <header className="mx-auto mb-6 flex max-w-7xl items-end justify-between gap-4">
       <div><p className="mb-2 text-xs font-bold uppercase tracking-[0.25em] text-orange-400">Workers AI</p><h1 className="text-3xl font-semibold tracking-tight">AI Studio</h1><p className="mt-1 text-sm text-slate-400">Cloudflare Workers AI · $0.011 per 1,000 neurons</p></div>
@@ -125,7 +132,7 @@ function App() {
     <section className="mx-auto grid max-w-7xl overflow-hidden rounded-3xl border border-white/10 bg-slate-900/80 shadow-2xl shadow-black/30 lg:grid-cols-[360px_1fr]">
       <aside className="border-b border-white/10 bg-slate-900/70 p-5 lg:border-b-0 lg:border-r">
         <div className="mb-6"><h2 className="font-semibold">Settings</h2><p className="mt-1 text-sm text-slate-400">Configure the model for this conversation.</p></div>
-        <div className="mb-2 flex items-center justify-between"><label className="label mb-0">Model</label><button className="copy-button" onClick={() => navigator.clipboard.writeText(model)}>Copy model ID</button></div>
+        <div className="mb-2 flex items-center justify-between"><label className="label mb-0">Model</label><button className={`copy-button ${copied ? "copied" : ""}`} onClick={copyModelId}>{copied ? "✓ Copied" : "Copy model ID"}</button></div>
         <div className="relative"><button className="model-button" onClick={() => setModelOpen(!modelOpen)}><span className="truncate">{model}</span><span>⌄</span></button>{modelOpen && <div className="model-menu"><input autoFocus className="model-search" placeholder="Search models…" value={modelSearch} onChange={(event) => setModelSearch(event.target.value)} />{Object.entries(groupedModels).map(([group, entries]) => { const visible = entries.filter((entry) => filteredModels.includes(entry)); return visible.length ? <div key={group}><div className="model-group">{group}</div>{visible.map((entry) => <button className={`model-option ${entry[1] === model ? "selected" : ""}`} key={entry[1]} onClick={() => { setModel(entry[1]); setModelOpen(false); setModelSearch(""); }}>{entry[1]}</button>)}</div> : null; })}</div>}</div>
         <div className="mt-3 rounded-xl border border-orange-400/20 bg-orange-400/5 p-3 text-xs text-orange-100"><div className="mb-2 font-semibold">{category} pricing</div><Pricing category={category} text={selected[2]} /></div>
         {isImage && <div className="mt-5 space-y-2"><label className="label">Image size · 9:16 default</label><div className="grid grid-cols-2 gap-2"><input className="control" type="number" value={imageSize.width} onChange={(e) => setImageSize({ ...imageSize, width: Number(e.target.value) })} /><input className="control" type="number" value={imageSize.height} onChange={(e) => setImageSize({ ...imageSize, height: Number(e.target.value) })} /></div></div>}
