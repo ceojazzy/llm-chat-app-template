@@ -23,6 +23,7 @@ const ALLOWED_MODEL_IDS = new Set([
   "google/gemini-3-flash",
   "google/gemini-3.1-flash-lite",
   "google/gemini-3.5-flash",
+  "@cf/google/gemma-4-26b-a4b-it",
 ]);
 
 // Default system prompt
@@ -103,8 +104,9 @@ async function handleChatRequest(
       );
     }
 
-    const isOpenAIModel = resolvedModel.startsWith("openai/");
-    const inputs = isOpenAIModel
+		const isMessageModel =
+			resolvedModel.startsWith("openai/") || resolvedModel.startsWith("@cf/");
+		const inputs = isMessageModel
       ? {
           messages: [
             { content: resolvedSystemPrompt, role: "system" },
