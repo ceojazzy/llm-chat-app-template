@@ -252,12 +252,74 @@
 				font-size: 0.85rem;
 				color: var(--text-light);
 			}
+
+			/* Modern interface styling */
+			:root {
+				--primary-color: #f48120;
+				--primary-hover: #d9680d;
+				--light-bg: #f6f7fb;
+				--border-color: #e6e8ef;
+				--text-color: #182230;
+				--text-light: #758096;
+				--user-msg-bg: #fff0e4;
+				--assistant-msg-bg: #ffffff;
+			}
+
+			body {
+				max-width: 1280px;
+				background: linear-gradient(135deg, #fffaf6 0%, #f4f6fb 52%, #eef2f8 100%);
+				padding: 2rem;
+			}
+
+			header {
+				margin-bottom: 1.5rem;
+				padding: 0.5rem 0 1.25rem;
+				border-bottom: 0;
+				text-align: left;
+			}
+
+			h1 { font-size: 1.85rem; letter-spacing: -0.04em; }
+			header p { color: var(--text-light); font-size: 0.9rem; }
+
+			.chat-container {
+				height: calc(100vh - 190px);
+				min-height: 560px;
+				border: 1px solid rgba(230, 232, 239, 0.9);
+				border-radius: 18px;
+				box-shadow: 0 24px 70px rgba(35, 45, 65, 0.12);
+				background: rgba(255, 255, 255, 0.78);
+				backdrop-filter: blur(16px);
+			}
+
+			.sidebar { width: 350px; padding: 1.5rem; background: rgba(255, 255, 255, 0.72); }
+			.sidebar h2 { font-size: 1.15rem; letter-spacing: -0.02em; }
+			.sidebar p { line-height: 1.45; }
+			.settings-group { margin-bottom: 1.35rem; }
+			.settings-label { color: #465269; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; }
+			#model-select, #system-prompt, #user-input {
+				border-color: #dfe3eb;
+				border-radius: 10px;
+				box-shadow: 0 2px 8px rgba(35, 45, 65, 0.04);
+			}
+			#system-prompt { min-height: 190px; }
+			.chat-messages { padding: 1.5rem; background: rgba(246, 247, 251, 0.78); }
+			.message { padding: 0.9rem 1rem; border: 1px solid rgba(230, 232, 239, 0.9); border-radius: 14px; box-shadow: 0 5px 16px rgba(35, 45, 65, 0.04); }
+			.message-input { padding: 1rem 1.25rem; background: rgba(255, 255, 255, 0.9); }
+			#user-input { padding: 0.8rem 0.95rem; }
+			#send-button { border-radius: 10px; font-weight: 600; }
+
+			@media (max-width: 760px) {
+				body { padding: 1rem; }
+				.chat-container { height: auto; min-height: calc(100vh - 150px); flex-direction: column; }
+				.sidebar { width: 100%; border-right: 0; border-bottom: 1px solid var(--border-color); }
+				.chat-panel { min-height: 500px; }
+			}
 		</style>
 	</head>
 	<body>
 		<header>
 			<h1>Cloudflare AI Chat</h1>
-			<p id="header-pricing"></p>
+			<p id="header-pricing">Cloudflare Workers AI · $0.011 per 1,000 neurons</p>
 		</header>
 
 		<div class="chat-container">

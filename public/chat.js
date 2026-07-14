@@ -94,12 +94,9 @@ for (const [category, id] of modelCatalog) {
 function updateModelPricing() {
 	const model = modelCatalog.find((entry) => entry[1] === modelInput.value);
 	modelPricing.replaceChildren();
-	if (!model) {
-		headerPricing.textContent = "Powered by Cloudflare Workers AI";
-		return;
-	}
+	if (!model) return;
 
-	headerPricing.textContent = `${model[0]} pricing · $0.011 per 1,000 neurons`;
+	headerPricing.textContent = "Cloudflare Workers AI · $0.011 per 1,000 neurons";
 
 	for (const price of model[2].split(" / ")) {
 		const row = document.createElement("div");
@@ -115,7 +112,9 @@ function updateModelPricing() {
 				: lowerPrice.includes("input")
 					? "Input"
 					: "Rate";
-		value.textContent = price;
+		value.textContent = price
+			.replace(/\s+(input|output|cached)/gi, "")
+			.replace(/neurons per M tokens/gi, "neurons / Million");
 		row.append(label, value);
 		modelPricing.appendChild(row);
 	}
