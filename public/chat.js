@@ -112,9 +112,12 @@ function updateModelPricing() {
 				: lowerPrice.includes("input")
 					? "Input"
 					: "Rate";
-		value.textContent = price
-			.replace(/\s+(input|output|cached)/gi, "")
-			.replace(/neurons per M tokens/gi, "neurons / Million");
+		if (model[0] === "LLM" || model[0] === "Embeddings") {
+			const neuronCount = price.match(/[\d,.]+/)?.[0] || price;
+			value.textContent = `${neuronCount} neurons / Million`;
+		} else {
+			value.textContent = price;
+		}
 		row.append(label, value);
 		modelPricing.appendChild(row);
 	}
