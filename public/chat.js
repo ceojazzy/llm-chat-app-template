@@ -12,6 +12,7 @@ const modelInput = document.getElementById("model-select");
 const copyModelButton = document.getElementById("copy-model-button");
 const audioInput = document.getElementById("audio-input");
 const systemPromptInput = document.getElementById("system-prompt");
+const systemPromptGroup = document.getElementById("system-prompt-group");
 const modelPricing = document.getElementById("model-pricing");
 const headerPricing = document.getElementById("header-pricing");
 
@@ -166,7 +167,12 @@ function isImageModel() {
 	return modelInput.value.startsWith("@cf/black-forest-labs/flux-");
 }
 
+function updateSystemPromptVisibility() {
+	systemPromptGroup.hidden = isAudioModel() || isImageModel() || isEmbeddingModel();
+}
+
 modelInput.addEventListener("change", () => {
+	updateSystemPromptVisibility();
 	userInput.placeholder = isAudioModel()
 		? "Choose an audio file, then click Send"
 		: isEmbeddingModel()
@@ -174,6 +180,8 @@ modelInput.addEventListener("change", () => {
 			: "Type your message here...";
 	if (isAudioModel()) audioInput.click();
 });
+
+updateSystemPromptVisibility();
 
 copyModelButton.addEventListener("click", async () => {
 	try {
